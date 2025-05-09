@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>PHI Choice DAT</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>PHI Choice Explorer</title>
   <link rel="stylesheet" href="style.css">
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -11,13 +11,14 @@
 <body>
   <header>
     <h1>PHI Choice <em>Explorer</em></h1>
-    <p>Simulate PHI uptake, costs &amp; savings by state &amp; funding model</p>
+    <p>Simulate PHI uptake, rebate costs &amp; hospital savings across Australia</p>
   </header>
 
   <nav class="tab-nav">
     <button class="tab-btn active" data-tab="simulator">Simulator</button>
     <button class="tab-btn" data-tab="charts">Charts</button>
-    <button class="tab-btn" data-tab="learn">Learn</button>
+    <button class="tab-btn" data-tab="instructions">Instructions</button>
+    <button class="tab-btn" data-tab="save">Save Results</button>
     <button class="tab-btn" data-tab="about">About</button>
   </nav>
 
@@ -25,13 +26,15 @@
     <!-- Simulator -->
     <section id="simulator" class="tab-content active">
       <div class="controls">
-        <div class="control"><label>State:</label>
+        <div class="control">
+          <label for="selectState">State:</label>
           <select id="selectState">
             <option>NSW</option><option>VIC</option><option>QLD</option><option>WA</option>
             <option>SA</option><option>TAS</option><option>NT</option><option>ACT</option>
           </select>
         </div>
-        <div class="control"><label>Funding Model:</label>
+        <div class="control">
+          <label for="selectFunding">Funding Model:</label>
           <select id="selectFunding">
             <option value="uniform">National Uniform</option>
             <option value="block">Block Grant</option>
@@ -40,7 +43,7 @@
         </div>
         <div class="control">
           <label>Rebate (%) <span id="valRebate">25</span></label>
-          <input type="range" id="sliderRebate" min="0" max="50" value="25">
+          <input type="range" id="sliderRebate" min="0" max="50" step="1" value="25">
         </div>
         <div class="control">
           <label>MLS (%) <span id="valMLS">1.5</span></label>
@@ -48,7 +51,7 @@
         </div>
         <div class="control">
           <label>Premium Δ (%) <span id="valPremium">0</span></label>
-          <input type="range" id="sliderPremium" min="-20" max="50" value="0">
+          <input type="range" id="sliderPremium" min="-20" max="50" step="1" value="0">
         </div>
         <div class="control">
           <label>Tier (1–4) <span id="valTier">2</span></label>
@@ -56,23 +59,22 @@
         </div>
       </div>
 
-      <button id="runBtn">Run Simulation</button>
-
       <div class="results">
         <div class="result-card">
-          <h3>Uptake</h3><p id="resUptake">— %</p>
+          <h3>Uptake</h3>
+          <p id="resUptake">— %</p>
         </div>
         <div class="result-card">
-          <h3>Rebate Cost</h3><p>$<span id="resRebateCost">—</span></p>
+          <h3>Rebate Cost</h3>
+          <p>$<span id="resRebateCost">—</span></p>
         </div>
         <div class="result-card">
-          <h3>Hospital Savings</h3><p>$<span id="resOffset">—</span></p>
+          <h3>Hospital Savings</h3>
+          <p>$<span id="resOffset">—</span></p>
         </div>
       </div>
 
-      <div id="recommendation" class="recommendation">
-        <!-- Filled dynamically -->
-      </div>
+      <div id="recommendation" class="recommendation">Adjust inputs to see recommendations here.</div>
     </section>
 
     <!-- Charts -->
@@ -86,7 +88,7 @@
         <canvas id="chartBudget"></canvas>
       </div>
       <div class="chart-container">
-        <h3>Elasticities</h3>
+        <h3>Elasticity Parameters</h3>
         <canvas id="chartElasticity"></canvas>
       </div>
       <div class="chart-container">
@@ -99,21 +101,36 @@
       </div>
     </section>
 
-    <!-- Learn -->
-    <section id="learn" class="tab-content">
-      <h2>How It Works</h2>
-      <pre>
-ΔU (%) = ε_price·ΔP + ε_rebate·ΔR + ε_mls·ΔM + ε_tier·ΔT
-Uptake_new = Uptake_baseline + ΔU/100
-      </pre>
-      <p>Click “Run Simulation” to update results &amp; charts.</p>
+    <!-- Instructions -->
+    <section id="instructions" class="tab-content">
+      <h2>How to Use</h2>
+      <ol>
+        <li><strong>Simulator:</strong> Choose state & funding, then adjust sliders.</li>
+        <li>Results update instantly below the sliders.</li>
+        <li><strong>Charts:</strong> Visualise trends, comparisons & scenarios.</li>
+        <li><strong>Save Results:</strong> Download your current scenario as CSV.</li>
+      </ol>
+      <p>Premiums and hospital savings are adjusted for each state’s cost of living. Recommendations adapt to your inputs.</p>
+    </section>
+
+    <!-- Save Results -->
+    <section id="save" class="tab-content">
+      <h2>Download Scenario</h2>
+      <button id="downloadBtn">Export CSV</button>
     </section>
 
     <!-- About -->
     <section id="about" class="tab-content">
-      <h2>About</h2>
-      <p>Open-source on GitHub Pages. No back-end needed.</p>
-    </section>
+      <h2>About PHI Choice Explorer</h2>
+      <p>Open-source tool on GitHub Pages. No backend required. Designed for policymakers, researchers & the public.</p>
+      <p><strong>Next features to consider:</strong>
+      <ul>
+        <li>Demographic filters (age, income, risk profile)</li>
+        <li>Side-by-side scenario comparison</li>
+        <li>Printable summary & PDF export</li>
+        <li>Mousel-over tooltips on sliders</li>
+      </ul>
+      </section>
   </main>
 
   <footer>© 2025 PHI Choice Explorer</footer>
