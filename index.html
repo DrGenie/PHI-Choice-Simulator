@@ -3,17 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>PHI Choice Simulator</title>
+  <title>PHI Choice Explorer</title>
   <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
   <header>
-    <h1>PHI Choice <em>Simulator</em></h1>
+    <h1>PHI Choice <em>Explorer</em></h1>
     <p>Interactive Decision Aid Tool for Private Health Insurance policy analysis</p>
   </header>
 
-  <!-- Tab navigation -->
+  <!-- Tabs -->
   <nav class="tab-nav">
     <button class="tab-btn active" data-tab="simulator">Simulator</button>
     <button class="tab-btn" data-tab="charts">Charts</button>
@@ -22,9 +22,30 @@
   </nav>
 
   <main>
-    <!-- Simulator tab -->
+    <!-- Simulator -->
     <section id="simulator" class="tab-content active">
       <div class="controls">
+        <div class="control">
+          <label for="selectState">State:</label>
+          <select id="selectState">
+            <option value="NSW">New South Wales</option>
+            <option value="VIC">Victoria</option>
+            <option value="QLD">Queensland</option>
+            <option value="WA">Western Australia</option>
+            <option value="SA">South Australia</option>
+            <option value="TAS">Tasmania</option>
+            <option value="NT">Northern Territory</option>
+            <option value="ACT">Australian Capital Territory</option>
+          </select>
+        </div>
+        <div class="control">
+          <label for="selectFunding">Funding Model:</label>
+          <select id="selectFunding">
+            <option value="uniform">National Uniform</option>
+            <option value="block">Block Grant</option>
+            <option value="abf">Activity-Based Funding</option>
+          </select>
+        </div>
         <div class="control">
           <label for="sliderRebate">Rebate Level (%) <span id="valRebate">25</span></label>
           <input type="range" id="sliderRebate" min="0" max="50" step="1" value="25">
@@ -59,54 +80,44 @@
       </div>
     </section>
 
-    <!-- Charts tab -->
+    <!-- Charts -->
     <section id="charts" class="tab-content">
-      <canvas id="chartUptake" width="600" height="250"></canvas>
-      <canvas id="chartBudget" width="600" height="250"></canvas>
-      <canvas id="chartElasticity" width="600" height="250"></canvas>
-      <canvas id="chartScenario" width="600" height="250"></canvas>
+      <div class="chart-container">
+        <h3>Uptake Over Scenarios</h3>
+        <canvas id="chartUptake"></canvas>
+      </div>
+      <div class="chart-container">
+        <h3>Budget Impact</h3>
+        <canvas id="chartBudget"></canvas>
+      </div>
+      <div class="chart-container">
+        <h3>Elasticity Parameters</h3>
+        <canvas id="chartElasticity"></canvas>
+      </div>
+      <div class="chart-container">
+        <h3>Uptake vs Rebate</h3>
+        <canvas id="chartScenario"></canvas>
+      </div>
+      <div class="chart-container">
+        <h3>State Comparison</h3>
+        <canvas id="chartStateComparison"></canvas>
+      </div>
     </section>
 
-    <!-- Learn tab -->
+    <!-- Learn -->
     <section id="learn" class="tab-content">
-      <h2>Understanding the Model</h2>
-      <p>This tool uses a <strong>log-linear elasticity model</strong>:</p>
-      <pre>
-ΔU (%) = ε_price·ΔP + ε_rebate·ΔR + ε_mls·ΔM + ε_tier·ΔT
-Uptake_new = U_baseline + ΔU/100
-      </pre>
-      <ul>
-        <li><strong>ε_price = –0.30</strong>: 1 %↑ premium → 0.30 %↓ uptake</li>
-        <li><strong>ε_rebate = +0.20</strong>: 1 %↑ rebate → 0.20 %↑ uptake</li>
-        <li><strong>ε_mls = +0.10</strong>: 1 %↑ MLS → 0.10 %↑ uptake</li>
-        <li><strong>ε_tier = +0.15</strong>: 1-tier ↑ → 0.15 %↑ uptake</li>
-      </ul>
-      <p>Baseline values:</p>
-      <ul>
-        <li>Uptake: 35 %</li>
-        <li>Premium: \$1,200</li>
-        <li>Rebate: 25 %</li>
-        <li>Hospital saving per person: \$400</li>
-      </ul>
-      <p>Use the “Simulator” to see how policy levers shift uptake, costs, and savings.</p>
+      <h2>Model &amp; Elasticities</h2>
+      <p><strong>Log-linear elasticity model:</strong></p>
+      <pre>ΔU (%) = ε_price·ΔP + ε_rebate·ΔR + ε_mls·ΔM + ε_tier·ΔT
+Uptake_new = U_baseline + ΔU/100</pre>
+      <p>Adjust sliders to see real-time effects by state and funding model.</p>
     </section>
 
-    <!-- About tab -->
+    <!-- About -->
     <section id="about" class="tab-content">
-      <h2>About PHI Choice Explorer</h2>
-      <p><strong>Purpose:</strong> Translate DCE-derived elasticities into intuitive simulations for policymakers, researchers, and the public.</p>
-      <p><strong>Benefits:</strong></p>
-      <ul>
-        <li>Rapid “what-if” analysis of rebate, MLS, premiums, and coverage tiers</li>
-        <li>Clear visualisation of trade-offs and budget impacts</li>
-        <li>Open-source, GitHub-hosted, no back-end required</li>
-      </ul>
-      <p><strong>Developed by:</strong> Your Health Economics Team, 2025</p>
-      <p><strong>References:</strong></p>
-      <ol>
-        <li>Smith et al. (2023), <em>J Health Econ</em>. Price Elasticity of PHI: –0.30.</li>
-        <li>Jones & Lee (2022), <em>Health Policy</em>. Impact of Rebates on PHI Uptake.</li>
-      </ol>
+      <h2>About</h2>
+      <p>Open-source tool for simulating PHI uptake, rebate costs, and hospital savings.</p>
+      <p>Compare across Australian states and funding frameworks.</p>
     </section>
   </main>
 
