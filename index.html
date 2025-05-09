@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PHI Choice Explorer</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <header>
+    <h1>PHI Choice <em>Explorer</em></h1>
+    <p>Interactive Decision Aid Tool for Private Health Insurance Policy Analysis</p>
+  </header>
+  <main>
+    <section id="instructions">
+      <h2>How to Use</h2>
+      <p>Adjust the sliders below to set policy parameters. The tool uses elasticity estimates to update:</p>
+      <ul>
+        <li><strong>Uptake Probability</strong> (how many people choose PHI)</li>
+        <li><strong>Government Rebate Cost</strong> (total rebate expenditure)</li>
+        <li><strong>Public Hospital Offset</strong> (savings in public hospital spending)</li>
+      </ul>
+    </section>
+
+    <section class="controls">
+      <div class="control">
+        <label for="sliderRebate">Rebate Level (%) <span class="value" id="valRebate">25</span></label>
+        <input type="range" id="sliderRebate" min="0" max="50" step="1" value="25">
+      </div>
+      <div class="control">
+        <label for="sliderMLS">Medicare Levy Surcharge (%) <span class="value" id="valMLS">1.5</span></label>
+        <input type="range" id="sliderMLS" min="0" max="2" step="0.1" value="1.5">
+      </div>
+      <div class="control">
+        <label for="sliderPremium">Premium Change (%) <span class="value" id="valPremium">0</span></label>
+        <input type="range" id="sliderPremium" min="-20" max="50" step="1" value="0">
+      </div>
+      <div class="control">
+        <label for="sliderTier">Coverage Tier (1–4) <span class="value" id="valTier">2</span></label>
+        <input type="range" id="sliderTier" min="1" max="4" step="1" value="2">
+      </div>
+    </section>
+
+    <section class="results">
+      <div class="result-card">
+        <h3>Uptake Probability</h3>
+        <p id="resUptake">-- %</p>
+      </div>
+      <div class="result-card">
+        <h3>Govt Rebate Cost</h3>
+        <p>$ <span id="resRebateCost">--</span></p>
+      </div>
+      <div class="result-card">
+        <h3>Hospital Savings</h3>
+        <p>$ <span id="resOffset">--</span></p>
+      </div>
+    </section>
+
+    <canvas id="chartUptake" width="800" height="300"></canvas>
+    <canvas id="chartBudget" width="800" height="300"></canvas>
+  </main>
+  <footer>
+    © 2025 PHI Choice Explorer | Developed by Health Economics Research Team
+  </footer>
+  <script src="script.js"></script>
+</body>
+</html>
