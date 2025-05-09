@@ -1,0 +1,72 @@
+:root {
+  --primary-color: #005f73;
+  --secondary-color: #0a9396;
+  --accent-color: #94d2bd;
+  --bg-color: #f0f5f9;
+  --text-color: #001219;
+  --font-family: 'Segoe UI', Tahoma, sans-serif;
+}
+body {
+  margin: 0; padding: 0;
+  font-family: var(--font-family);
+  background: var(--bg-color);
+  color: var(--text-color);
+}
+header {
+  background: var(--primary-color);
+  color: white;
+  padding: 1rem;
+  text-align: center;
+}
+main {
+  max-width: 1000px;
+  margin: 2rem auto;
+  padding: 1rem;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+h1, h2 { margin: 0.5rem 0; }
+.controls {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin: 2rem 0;
+}
+.control {
+  background: var(--accent-color);
+  padding: 1rem;
+  border-radius: 6px;
+}
+.control label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+.control input[type=range] {
+  width: 100%;
+}
+.control .value {
+  float: right;
+  font-weight: normal;
+}
+.results {
+  display: flex;
+  justify-content: space-around;
+  margin: 2rem 0;
+}
+.result-card {
+  background: var(--secondary-color);
+  color: white;
+  padding: 1rem;
+  border-radius: 6px;
+  width: 30%;
+  text-align: center;
+}
+canvas { margin-top: 2rem; }
+footer {
+  text-align: center;
+  padding: 1rem;
+  font-size: 0.9rem;
+  color: #555;
+}
