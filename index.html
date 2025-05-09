@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>PHI Choice Simulator</title>
+  <title>PHI Choice Explorer</title>
   <link rel="stylesheet" href="style.css">
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
   <header>
-    <h1>PHI Choice <em>Simulator</em></h1>
-    <p>Interactive Decision Aid Tool for Private Health Insurance policy analysis</p>
+    <h1>PHI Choice <em>Explorer</em></h1>
+    <p>Simulate PHI uptake, costs &amp; savings by state &amp; funding model</p>
   </header>
 
   <nav class="tab-nav">
@@ -22,24 +22,16 @@
   </nav>
 
   <main>
-    <!-- Simulator tab -->
+    <!-- Simulator -->
     <section id="simulator" class="tab-content active">
       <div class="controls">
-        <div class="control">
-          <label for="selectState">State:</label>
+        <div class="control"><label>State:</label>
           <select id="selectState">
-            <option value="NSW">New South Wales</option>
-            <option value="VIC">Victoria</option>
-            <option value="QLD">Queensland</option>
-            <option value="WA">Western Australia</option>
-            <option value="SA">South Australia</option>
-            <option value="TAS">Tasmania</option>
-            <option value="NT">Northern Territory</option>
-            <option value="ACT">Australian Capital Territory</option>
+            <option>NSW</option><option>VIC</option><option>QLD</option><option>WA</option>
+            <option>SA</option><option>TAS</option><option>NT</option><option>ACT</option>
           </select>
         </div>
-        <div class="control">
-          <label for="selectFunding">Funding Model:</label>
+        <div class="control"><label>Funding Model:</label>
           <select id="selectFunding">
             <option value="uniform">National Uniform</option>
             <option value="block">Block Grant</option>
@@ -47,19 +39,19 @@
           </select>
         </div>
         <div class="control">
-          <label for="sliderRebate">Rebate (%) <span id="valRebate">25</span></label>
-          <input type="range" id="sliderRebate" min="0" max="50" step="1" value="25">
+          <label>Rebate (%) <span id="valRebate">25</span></label>
+          <input type="range" id="sliderRebate" min="0" max="50" value="25">
         </div>
         <div class="control">
-          <label for="sliderMLS">MLS (%) <span id="valMLS">1.5</span></label>
+          <label>MLS (%) <span id="valMLS">1.5</span></label>
           <input type="range" id="sliderMLS" min="0" max="2" step="0.1" value="1.5">
         </div>
         <div class="control">
-          <label for="sliderPremium">Premium Δ (%) <span id="valPremium">0</span></label>
-          <input type="range" id="sliderPremium" min="-20" max="50" step="1" value="0">
+          <label>Premium Δ (%) <span id="valPremium">0</span></label>
+          <input type="range" id="sliderPremium" min="-20" max="50" value="0">
         </div>
         <div class="control">
-          <label for="sliderTier">Tier (1–4) <span id="valTier">2</span></label>
+          <label>Tier (1–4) <span id="valTier">2</span></label>
           <input type="range" id="sliderTier" min="1" max="4" step="1" value="2">
         </div>
       </div>
@@ -68,21 +60,22 @@
 
       <div class="results">
         <div class="result-card">
-          <h3>Uptake</h3>
-          <p id="resUptake">35.0 %</p>
+          <h3>Uptake</h3><p id="resUptake">— %</p>
         </div>
         <div class="result-card">
-          <h3>Rebate Cost</h3>
-          <p>$<span id="resRebateCost">300</span></p>
+          <h3>Rebate Cost</h3><p>$<span id="resRebateCost">—</span></p>
         </div>
         <div class="result-card">
-          <h3>Hospital Savings</h3>
-          <p>$<span id="resOffset">400</span></p>
+          <h3>Hospital Savings</h3><p>$<span id="resOffset">—</span></p>
         </div>
+      </div>
+
+      <div id="recommendation" class="recommendation">
+        <!-- Filled dynamically -->
       </div>
     </section>
 
-    <!-- Charts tab -->
+    <!-- Charts -->
     <section id="charts" class="tab-content">
       <div class="chart-container">
         <h3>Uptake Over Scenarios</h3>
@@ -106,18 +99,20 @@
       </div>
     </section>
 
-    <!-- Learn tab -->
+    <!-- Learn -->
     <section id="learn" class="tab-content">
       <h2>How It Works</h2>
-      <p><strong>Model</strong>: ΔU (%) = ε_price·ΔP + ε_rebate·ΔR + ε_mls·ΔM + ε_tier·ΔT<br>
-         Uptake_new = Uptake_baseline + ΔU/100</p>
-      <p>Adjust levers, then click “Run Simulation”. Charts update in “Charts” tab.</p>
+      <pre>
+ΔU (%) = ε_price·ΔP + ε_rebate·ΔR + ε_mls·ΔM + ε_tier·ΔT
+Uptake_new = Uptake_baseline + ΔU/100
+      </pre>
+      <p>Click “Run Simulation” to update results &amp; charts.</p>
     </section>
 
-    <!-- About tab -->
+    <!-- About -->
     <section id="about" class="tab-content">
       <h2>About</h2>
-      <p>Simulate PHI uptake, costs &amp; savings by state &amp; funding model. Open-source, GitHub Pages.</p>
+      <p>Open-source on GitHub Pages. No back-end needed.</p>
     </section>
   </main>
 
