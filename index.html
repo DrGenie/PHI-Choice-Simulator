@@ -2,36 +2,68 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>PHI Choice Explorer</title>
   <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
   <header>
     <h1>PHI Choice <em>Explorer</em></h1>
-    <p>Simulate PHI uptake, rebate costs & hospital savings across Australia</p>
   </header>
 
+  <!-- Tabs in required order -->
   <nav class="tab-nav">
-    <button class="tab-btn active" data-tab="simulator">Simulator</button>
-    <button class="tab-btn" data-tab="charts">Charts</button>
+    <button class="tab-btn active" data-tab="intro">Introduction</button>
     <button class="tab-btn" data-tab="instructions">Instructions</button>
+    <button class="tab-btn" data-tab="simulator">Simulator</button>
+    <button class="tab-btn" data-tab="visualisations">Visualisations</button>
     <button class="tab-btn" data-tab="compare">Scenario Compare</button>
     <button class="tab-btn" data-tab="save">Save/Export</button>
-    <button class="tab-btn" data-tab="about">About</button>
   </nav>
 
   <main>
-    <!-- Simulator -->
-    <section id="simulator" class="tab-content active">
+    <!-- 1. Introduction -->
+    <section id="intro" class="tab-content active">
+      <h2>What is PHI Choice Explorer?</h2>
+      <p>
+        This tool translates discrete‐choice experiment results into interactive simulations of private health insurance (PHI) uptake,
+        government rebate costs, and public hospital savings across Australian states and nationally.
+        Adjust policy levers—premium cost, rebate percentage, Medicare Levy Surcharge (MLS), coverage tier—and see dynamic outcomes.
+      </p>
+    </section>
+
+    <!-- 2. Instructions -->
+    <section id="instructions" class="tab-content">
+      <h2>How to Use</h2>
+      <ol>
+        <li>Go to <strong>Simulator</strong> and select a state (or “National”) and funding model.</li>
+        <li>Adjust sliders for rebate, MLS, premium change, coverage tier, and (optionally) cost‐of‐living.</li>
+        <li>Click <strong>Run Simulation</strong>. Results will appear below.</li>
+        <li>Switch to <strong>Visualisations</strong> to explore uptake over time, budget impact, and elasticity charts.</li>
+        <li>Save scenarios in <strong>Scenario Compare</strong>; export via <strong>Save/Export</strong>.</li>
+      </ol>
+    </section>
+
+    <!-- 3. Simulator -->
+    <section id="simulator" class="tab-content">
+      <h2>Simulator Inputs</h2>
       <div class="controls">
-        <div class="control"><label title="Select State">State:</label>
-          <select id="selectState"></select>
+        <div class="control">
+          <label title="Select a state or national overview">Location:</label>
+          <select id="selectState">
+            <option>National</option>
+            <option>NSW</option><option>VIC</option><option>QLD</option><option>WA</option>
+            <option>SA</option><option>TAS</option><option>NT</option><option>ACT</option>
+          </select>
         </div>
-        <div class="control"><label title="Select funding model">Funding Model:</label>
-          <select id="selectFunding"></select>
+        <div class="control">
+          <label title="Choose funding mechanism">Funding Model:</label>
+          <select id="selectFunding">
+            <option value="uniform">National Uniform</option>
+            <option value="block">Block Grant</option>
+            <option value="abf">Activity‐Based Funding</option>
+          </select>
         </div>
         <div class="control">
           <label title="Percentage rebate on premium">Rebate (%) <span id="valRebate">25</span></label>
@@ -46,78 +78,53 @@
           <input type="range" id="sliderPremium" min="-20" max="50" step="1" value="0">
         </div>
         <div class="control">
-          <label title="Coverage breadth tier">Coverage Tier (1–4) <span id="valTier">2</span></label>
+          <label title="Coverage breadth tier">Tier (1–4) <span id="valTier">2</span></label>
           <input type="range" id="sliderTier" min="1" max="4" step="1" value="2">
         </div>
-        <div class="control"><label title="Select age bracket">Age:</label>
-          <select id="selAge"></select>
-        </div>
-        <div class="control"><label title="Select income bracket">Income:</label>
-          <select id="selIncome"></select>
-        </div>
-        <div class="control"><label title="Select personal health risk type">Risk Type:</label>
-          <select id="selRisk"></select>
-        </div>
         <div class="control">
-          <label title="Simulate rollout year">Year: <span id="valYear">2025</span></label>
-          <input type="range" id="sliderYear" min="2025" max="2030" step="1" value="2025">
-        </div>
-        <div class="control">
-          <label title="Toggle cost-of-living adjustment">Adjust for Cost of Living:</label>
+          <label title="Adjust for cost of living differences">Cost-of-Living?</label>
           <input type="checkbox" id="chkCOL" checked>
         </div>
       </div>
+
+      <button id="runBtn" class="action-btn">Run Simulation</button>
+
       <div class="results">
         <div class="result-card"><h3>Uptake</h3><p id="resUptake">— %</p></div>
         <div class="result-card"><h3>Rebate Cost</h3><p>$<span id="resRebateCost">—</span></p></div>
         <div class="result-card"><h3>Hospital Savings</h3><p>$<span id="resOffset">—</span></p></div>
       </div>
-      <div id="recommendation" class="recommendation">Adjust inputs to see policy recommendations.</div>
+
+      <div id="recommendation" class="recommendation">
+        Policy recommendation will appear here.
+      </div>
     </section>
 
-    <!-- Charts -->
-    <section id="charts" class="tab-content">
+    <!-- 4. Visualisations -->
+    <section id="visualisations" class="tab-content">
+      <h2>Visualisations</h2>
       <div class="chart-container"><h3>Uptake Over Scenarios</h3><canvas id="chartUptake"></canvas></div>
       <div class="chart-container"><h3>Budget Impact</h3><canvas id="chartBudget"></canvas></div>
-      <div class="chart-container"><h3>Logit Coefficients</h3><canvas id="chartCoeffs"></canvas></div>
-      <div class="chart-container"><h3>Uptake vs Rebate</h3><canvas id="chartScenario"></canvas></div>
-      <div class="chart-container"><h3>State Comparison</h3><canvas id="chartStateComparison"></canvas></div>
+      <div class="chart-container"><h3>Elasticity Coefficients</h3><canvas id="chartCoeffs"></canvas></div>
     </section>
 
-    <!-- Instructions -->
-    <section id="instructions" class="tab-content">
-      <h2>Instructions</h2>
-      <ol>
-        <li>In <strong>Simulator</strong>, pick state, funding & attributes.</li>
-        <li>Use demographic filters and year slider.</li>
-        <li>Results update automatically.</li>
-        <li>View detailed charts in <strong>Charts</strong>.</li>
-        <li>Add scenarios in <strong>Scenario Compare</strong>.</li>
-        <li>Export CSV/PDF in <strong>Save/Export</strong>.</li>
-      </ol>
-    </section>
-
-    <!-- Scenario Compare -->
+    <!-- 5. Scenario Compare -->
     <section id="compare" class="tab-content">
-      <h2>Scenario Comparison</h2>
+      <h2>Scenario Compare</h2>
       <button id="btnAddScenario" class="action-btn">Add Current Scenario</button>
       <table id="tblScenarios">
-        <thead><tr><th>#</th><th>Params</th><th>Uptake</th><th>Rebate Cost</th><th>Hosp Save</th></tr></thead>
+        <thead>
+          <tr><th>#</th><th>Params</th><th>Uptake</th><th>Rebate Cost</th><th>Hosp. Saving</th></tr>
+        </thead>
         <tbody></tbody>
       </table>
     </section>
 
-    <!-- Save/Export -->
+    <!-- 6. Save/Export -->
     <section id="save" class="tab-content">
       <h2>Save / Export</h2>
       <button id="btnDownloadCSV" class="action-btn">Download CSV</button>
       <button id="btnDownloadPDF" class="action-btn">Download PDF</button>
-    </section>
-
-    <!-- About -->
-    <section id="about" class="tab-content">
-      <h2>About</h2>
-      <p>PHI Choice Explorer: open-source policy simulation tool on GitHub Pages.</p>
     </section>
   </main>
 
