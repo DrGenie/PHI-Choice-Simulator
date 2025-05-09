@@ -9,28 +9,27 @@ const stateElasticities = {
   NT:  { price:-0.33, rebate:0.17, mls:0.14, tier:0.12 },
   ACT: { price:-0.30, rebate:0.20, mls:0.12, tier:0.15 }
 };
-// Funding multipliers for hospital savings
+// Funding multipliers
 const fundingMult = { uniform:1, block:0.9, abf:1.1 };
-
-// Baseline
+// Baseline values
 const baseline = {
-  uptake:0.35,
-  premium:1200,
-  rebatePct:25,
-  hospitalOffsetPer:400
+  uptake: 0.35,
+  premium: 1200,
+  rebatePct: 25,
+  hospitalOffsetPer: 400
 };
 
-// Tabs
-document.querySelectorAll('.tab-btn').forEach(btn=>{
-  btn.onclick=()=>{
+// Tab switching
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
     document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
     document.querySelectorAll('.tab-content').forEach(s=>s.classList.remove('active'));
     btn.classList.add('active');
     document.getElementById(btn.dataset.tab).classList.add('active');
-  };
+  });
 });
 
-// DOM
+// DOM references
 const elems = {
   state:   document.getElementById('selectState'),
   funding: document.getElementById('selectFunding'),
@@ -44,95 +43,106 @@ const elems = {
   valT:    document.getElementById('valTier'),
   resU:    document.getElementById('resUptake'),
   resRC:   document.getElementById('resRebateCost'),
-  resO:    document.getElementById('resOffset')
+  resO:    document.getElementById('resOffset'),
+  runBtn:  document.getElementById('runBtn')
 };
 
-// Charts
-const chartU = new Chart(elems.canvasU = document.getElementById('chartUptake').getContext('2d'), {
-  type:'line',
-  data:{ labels:[], datasets:[{ label:'Uptake (%)', data:[], borderColor:'#005f73', fill:false }]},
+// Initialize charts with baseline
+const chartUptake = new Chart(document.getElementById('chartUptake').getContext('2d'), {
+  type: 'line',
+  data: { labels: ['Baseline'], datasets: [{ label: 'Uptake (%)', data: [baseline.uptake*100], borderColor: '#005f73', fill:false }] },
   options:{ scales:{ y:{ beginAtZero:true, max:100 } } }
 });
-const chartB = new Chart(document.getElementById('chartBudget').getContext('2d'), {
+const chartBudget = new Chart(document.getElementById('chartBudget').getContext('2d'), {
   type:'bar',
-  data:{ labels:['Rebate Cost','Hospital Savings'], datasets:[{ label:'AUD/person', data:[], backgroundColor:['rgba(10,147,150,0.7)','rgba(148,210,189,0.7)'] }]},
+  data:{ labels:['Rebate Cost','Hospital Savings'], datasets:[{ label:'AUD/person', data:[baseline.premium*baseline.rebatePct/100*baseline.uptake, baseline.hospitalOffsetPer*baseline.uptake], backgroundColor:['rgba(10,147,150,0.7)','rgba(148,210,189,0.7)'] }] },
   options:{ scales:{ y:{ beginAtZero:true } } }
 });
-const chartE = new Chart(document.getElementById('chartElasticity').getContext('2d'), {
+const chartElasticity = new Chart(document.getElementById('chartElasticity').getContext('2d'), {
   type:'bar',
-  data:{ labels:['Price','Rebate','MLS','Tier'], datasets:[{ label:'Elasticity', data:[0,0,0,0], backgroundColor:['#005f73','#0a9396','#94d2bd','#ee9b00'] }] },
+  data:{ labels:['Price','Rebate','MLS','Tier'], datasets:[{ label:'Elasticity', data:Object.values(stateElasticities[elems.state.value]), backgroundColor:['#005f73','#0a9396','#94d2bd','#ee9b00'] }] },
   options:{ indexAxis:'y', scales:{ x:{ beginAtZero:true } } }
 });
-const rebates = Array.from({length:11},(_,i)=>i*5), uptakeCurve = rebates.map(R=>{
-  const d = elasticities.rebate*(R-baseline.rebatePct);
+const rebates = Array.from({length:11},(_,i)=>i*5);
+const uptakeCurve = rebates.map(R => {
+  const d = stateElasticities[elems.state.value].rebate*(R-baseline.rebatePct);
   return Math.max(0,Math.min(1,baseline.uptake + d/100))*100;
 });
-const chartS = new Chart(document.getElementById('chartScenario').getContext('2d'), {
+const chartScenario = new Chart(document.getElementById('chartScenario').getContext('2d'), {
   type:'line',
-  data:{ labels:rebates.map(r=>r+'%'), datasets:[{ label:'Uptake vs Rebate', data:uptakeCurve, borderColor:'#ee9b00', fill:false }]},
+  data:{ labels:rebates.map(r=>r+'%'), datasets:[{ label:'Uptake vs Rebate', data:uptakeCurve, borderColor:'#ee9b00', fill:false }] },
   options:{ scales:{ y:{ beginAtZero:true, max:100 } } }
 });
 const stateNames = Object.keys(stateElasticities);
-const chartSC = new Chart(document.getElementById('chartStateComparison').getContext('2d'), {
+const chartStateComparison = new Chart(document.getElementById('chartStateComparison').getContext('2d'), {
   type:'bar',
-  data:{ labels:stateNames, datasets:[{ label:'Uptake (%) by State', data:[], backgroundColor:stateNames.map((_,i)=>`hsl(${i*40},70%,50%)`) }]},
+  data:{ labels:stateNames, datasets:[{ label:'Baseline Uptake (%)', data:stateNames.map(s=>baseline.uptake*100), backgroundColor:stateNames.map((_,i)=>`hsl(${i*40},70%,50%)`) }] },
   options:{ scales:{ y:{ beginAtZero:true, max:100 } } }
 });
 
-// Update
-function update() {
-  const st = elems.state.value, fm = elems.funding.value,
-        R = +elems.rebate.value, M = +elems.mls.value,
-        P = +elems.premium.value, T = +elems.tier.value;
-  elems.valR.textContent=R;
-  elems.valM.textContent=M.toFixed(1);
-  elems.valP.textContent=P;
-  elems.valT.textContent=T;
+// Run simulation on click
+elems.runBtn.addEventListener('click', () => {
+  const st = elems.state.value,
+        fm = elems.funding.value,
+        R  = +elems.rebate.value,
+        M  = +elems.mls.value,
+        P  = +elems.premium.value,
+        T  = +elems.tier.value;
+  // Update display values
+  elems.valR.textContent = R;
+  elems.valM.textContent = M.toFixed(1);
+  elems.valP.textContent = P;
+  elems.valT.textContent = T;
 
-  // state elasticities
+  // Compute uptake
   const e = stateElasticities[st];
-  const dU = e.price*P + e.rebate*(R-baseline.rebatePct) + e.mls*M + e.tier*(T-1);
-  let up = baseline.uptake + dU/100;
-  up = Math.max(0,Math.min(1,up));
+  const deltaU = e.price*P + e.rebate*(R-baseline.rebatePct) + e.mls*M + e.tier*(T-1);
+  let uptake = baseline.uptake + deltaU/100;
+  uptake = Math.max(0, Math.min(1, uptake));
 
-  const premAmt = baseline.premium*(1+P/100),
-        rebatePer = premAmt*(R/100),
-        rebateCost = rebatePer*up,
-        hospOffset = baseline.hospitalOffsetPer*up*fundingMult[fm];
+  // Costs
+  const premiumAmt = baseline.premium*(1+P/100),
+        rebatePer  = premiumAmt*(R/100),
+        rebateCost = rebatePer*uptake,
+        hospOffset = baseline.hospitalOffsetPer*uptake*fundingMult[fm];
 
-  elems.resU.textContent = (up*100).toFixed(1);
+  // Update results
+  elems.resU.textContent  = (uptake*100).toFixed(1);
   elems.resRC.textContent = rebateCost.toFixed(0);
-  elems.resO.textContent = hospOffset.toFixed(0);
+  elems.resO.textContent  = hospOffset.toFixed(0);
 
-  // Uptake chart
-  const lbl=`${st}-R${R}-P${P}-M${M}-T${T}`;
-  if(chartU.data.labels.length>20){
-    chartU.data.labels.shift(); chartU.data.datasets[0].data.shift();
+  // Update uptake chart
+  const label = `${st}-R${R}-P${P}-M${M}-T${T}`;
+  if(chartUptake.data.labels.length>20){
+    chartUptake.data.labels.shift();
+    chartUptake.data.datasets[0].data.shift();
   }
-  chartU.data.labels.push(lbl);
-  chartU.data.datasets[0].data.push((up*100).toFixed(1));
-  chartU.update();
+  chartUptake.data.labels.push(label);
+  chartUptake.data.datasets[0].data.push((uptake*100).toFixed(1));
+  chartUptake.update();
 
-  // Budget
-  chartB.data.datasets[0].data=[rebateCost.toFixed(0), hospOffset.toFixed(0)];
-  chartB.update();
+  // Update budget chart
+  chartBudget.data.datasets[0].data = [rebateCost.toFixed(0), hospOffset.toFixed(0)];
+  chartBudget.update();
 
-  // Elasticities
-  chartE.data.datasets[0].data=[ e.price, e.rebate, e.mls, e.tier ];
-  chartE.update();
+  // Update elasticity chart
+  chartElasticity.data.datasets[0].data = [e.price, e.rebate, e.mls, e.tier];
+  chartElasticity.update();
 
-  // State comparison
-  chartSC.data.datasets[0].data = stateNames.map(s=>{
-    const es = stateElasticities[s];
-    const du = es.price*P + es.rebate*(R-baseline.rebatePct) + es.mls*M + es.tier*(T-1);
-    const upS = Math.max(0,Math.min(1,baseline.uptake + du/100));
-    return +(upS*100).toFixed(1);
+  // Update scenario chart
+  const newCurve = rebates.map(r => {
+    const d2 = e.rebate*(r-baseline.rebatePct);
+    return Math.max(0, Math.min(1,baseline.uptake + d2/100))*100;
   });
-  chartSC.update();
-}
+  chartScenario.data.datasets[0].data = newCurve;
+  chartScenario.update();
 
-// listeners
-[...Object.values(elems).slice(2,6), elems.state, elems.funding]
-  .forEach(el=>el.addEventListener('input', update));
-
-update();
+  // Update state comparison
+  const comp = stateNames.map(s => {
+    const es = stateElasticities[s];
+    const d3 = es.price*P + es.rebate*(R-baseline.rebatePct) + es.mls*M + es.tier*(T-1);
+    return Math.max(0, Math.min(1, baseline.uptake + d3/100))*100;
+  });
+  chartStateComparison.data.datasets[0].data = comp;
+  chartStateComparison.update();
+});
