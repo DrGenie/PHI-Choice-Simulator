@@ -3,16 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>PHI Choice DAT</title>
+  <title>HIPIS – Health Insurance Policy Interactive Simulator</title>
   <link rel="stylesheet" href="style.css">
+  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- jsPDF for PDF export -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
   <header>
-    <h1>PHI Choice <em>DAT</em></h1>
+    <h1>HIPIS</h1>
+    <p><strong>Health Insurance Policy Interactive Simulator</strong></p>
   </header>
 
-  <!-- Tabs in required order -->
   <nav class="tab-nav">
     <button class="tab-btn active" data-tab="intro">Introduction</button>
     <button class="tab-btn" data-tab="instructions">Instructions</button>
@@ -23,66 +26,64 @@
   </nav>
 
   <main>
-    <!-- 1. Introduction -->
+    <!-- Introduction -->
     <section id="intro" class="tab-content active">
-      <h2>What is PHI Choice DAT?</h2>
+      <h2>About HIPIS</h2>
       <p>
-        This tool translates discrete‐choice experiment results into interactive simulations of private health insurance (PHI) uptake,
-        government rebate costs, and public hospital savings across Australian states and nationally.
-        Adjust policy levers—premium cost, rebate percentage, Medicare Levy Surcharge (MLS), coverage tier—and see dynamic outcomes.
+        HIPIS (Health Insurance Policy Interactive Simulator) lets policymakers and analysts explore how changes
+        in premium cost, rebate levels, Medicare Levy Surcharge (MLS), coverage breadth, and provider network access
+        influence PHI uptake, government rebate expenditure, and public hospital savings—both nationally and by state.
       </p>
     </section>
 
-    <!-- 2. Instructions -->
+    <!-- Instructions -->
     <section id="instructions" class="tab-content">
-      <h2>How to Use</h2>
+      <h2>How to Use HIPIS</h2>
       <ol>
-        <li>Go to <strong>Simulator</strong> and select a state (or “National”) and funding model.</li>
-        <li>Adjust sliders for rebate, MLS, premium change, coverage tier, and (optionally) cost‐of‐living.</li>
-        <li>Click <strong>Run Simulation</strong>. Results will appear below.</li>
-        <li>Switch to <strong>Visualisations</strong> to explore uptake over time, budget impact, and elasticity charts.</li>
-        <li>Save scenarios in <strong>Scenario Compare</strong>; export via <strong>Save/Export</strong>.</li>
+        <li><strong>Simulator</strong>: Select location, funding model, and adjust policy levers.</li>
+        <li>Click <em>Run Simulation</em>. Results appear below.</li>
+        <li><strong>Visualisations</strong>: View dynamic, non-overlapping charts of uptake, budget impact, and coefficients.</li>
+        <li><strong>Scenario Compare</strong>: Save multiple scenarios and compare side-by-side.</li>
+        <li><strong>Save/Export</strong>: Download your scenario as CSV or PDF for reports.</li>
       </ol>
     </section>
 
-    <!-- 3. Simulator -->
+    <!-- Simulator -->
     <section id="simulator" class="tab-content">
       <h2>Simulator Inputs</h2>
       <div class="controls">
-        <div class="control">
-          <label title="Select a state or national overview">Location:</label>
+        <div class="control"><label>Location:</label>
           <select id="selectState">
             <option>National</option>
             <option>NSW</option><option>VIC</option><option>QLD</option><option>WA</option>
             <option>SA</option><option>TAS</option><option>NT</option><option>ACT</option>
           </select>
         </div>
-        <div class="control">
-          <label title="Choose funding mechanism">Funding Model:</label>
+        <div class="control"><label>Funding Model:</label>
           <select id="selectFunding">
             <option value="uniform">National Uniform</option>
             <option value="block">Block Grant</option>
-            <option value="abf">Activity‐Based Funding</option>
+            <option value="abf">Activity-Based Funding</option>
           </select>
         </div>
         <div class="control">
-          <label title="Percentage rebate on premium">Rebate (%) <span id="valRebate">25</span></label>
+          <label>Rebate (%) <span id="valRebate">25</span></label>
           <input type="range" id="sliderRebate" min="0" max="50" step="1" value="25">
         </div>
         <div class="control">
-          <label title="Medicare Levy Surcharge rate">MLS (%) <span id="valMLS">1.5</span></label>
+          <label>MLS (%) <span id="valMLS">1.5</span></label>
           <input type="range" id="sliderMLS" min="0" max="2" step="0.1" value="1.5">
         </div>
         <div class="control">
-          <label title="Premium change relative to baseline">Premium Δ (%) <span id="valPremium">0</span></label>
+          <label>Premium Δ (%) <span id="valPremium">0</span></label>
           <input type="range" id="sliderPremium" min="-20" max="50" step="1" value="0">
         </div>
         <div class="control">
-          <label title="Coverage breadth tier">Tier (1–4) <span id="valTier">2</span></label>
+          <label>Coverage Tier (1–4) <span id="valTier">2</span></label>
           <input type="range" id="sliderTier" min="1" max="4" step="1" value="2">
         </div>
         <div class="control">
-          <label title="Adjust for cost of living differences">Cost-of-Living?</label>
+          <label>Adjust for Cost-of-Living</label>
           <input type="checkbox" id="chkCOL" checked>
         </div>
       </div>
@@ -96,31 +97,31 @@
       </div>
 
       <div id="recommendation" class="recommendation">
-        Policy recommendation will appear here.
+        Comprehensive policy recommendation will be generated here, highlighting trade-offs between fiscal cost, coverage equity, and system sustainability.
       </div>
     </section>
 
-    <!-- 4. Visualisations -->
+    <!-- Visualisations -->
     <section id="visualisations" class="tab-content">
       <h2>Visualisations</h2>
       <div class="chart-container"><h3>Uptake Over Scenarios</h3><canvas id="chartUptake"></canvas></div>
       <div class="chart-container"><h3>Budget Impact</h3><canvas id="chartBudget"></canvas></div>
-      <div class="chart-container"><h3>Elasticity Coefficients</h3><canvas id="chartCoeffs"></canvas></div>
+      <div class="chart-container"><h3>Logit Coefficients</h3><canvas id="chartCoeffs"></canvas></div>
     </section>
 
-    <!-- 5. Scenario Compare -->
+    <!-- Scenario Compare -->
     <section id="compare" class="tab-content">
       <h2>Scenario Compare</h2>
       <button id="btnAddScenario" class="action-btn">Add Current Scenario</button>
       <table id="tblScenarios">
         <thead>
-          <tr><th>#</th><th>Params</th><th>Uptake</th><th>Rebate Cost</th><th>Hosp. Saving</th></tr>
+          <tr><th>#</th><th>Parameters</th><th>Uptake</th><th>Rebate Cost</th><th>Hospital Savings</th></tr>
         </thead>
         <tbody></tbody>
       </table>
     </section>
 
-    <!-- 6. Save/Export -->
+    <!-- Save/Export -->
     <section id="save" class="tab-content">
       <h2>Save / Export</h2>
       <button id="btnDownloadCSV" class="action-btn">Download CSV</button>
@@ -128,7 +129,7 @@
     </section>
   </main>
 
-  <footer>© 2025 PHI Choice Explorer</footer>
+  <footer>© 2025 HIPIS</footer>
   <script src="script.js"></script>
 </body>
 </html>
